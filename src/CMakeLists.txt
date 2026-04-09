@@ -18,6 +18,13 @@ message(STATUS "Parent Directory Name: ${PARENT_NAME}")
 project(${PARENT_NAME})
 message("PROJECT_NAME: ${PROJECT_NAME}")
 
+# 查找 编译器
+if(MSVC)
+	enable_language(CXX)
+	# enable_language(CUDA)
+	# enable_language(ASM_MASM)
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(MSVC)
 set(CMAKE_GENERATOR_PLATFORM x64)
@@ -25,6 +32,7 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# 设置 CXX 标准
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -49,6 +57,15 @@ endif()
 # set(CMAKE_MFC_FLAG 2)
 # endif()
 
+# CUDA
+# find_package(CUDAToolkit REQUIRED)
+# message("CUDAToolkit_FOUND = ${CUDAToolkit_FOUND}")
+# message("CUDAToolkit_VERSION =  ${CUDAToolkit_VERSION}")
+# message(STATUS "CUDA Compiler: ${CMAKE_CUDA_COMPILER}")
+# message(STATUS "CUDA Compiler Version: ${CMAKE_CUDA_COMPILER_VERSION}")
+# message(STATUS "CUDA Toolkit Root: ${CUDAToolkit_ROOT}")
+# message(STATUS "CUDA Architectures: ${CMAKE_CUDA_ARCHITECTURES}")
+
 # #Python3
 # find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 # message("Python3_FOUND = ${Python3_FOUND}")
@@ -56,7 +73,7 @@ endif()
 # message("Python3_LIBS = ${Python3_LIBRARIES}")
 #==================================================================================#
 
-# OpenCV
+# #OpenCV
 find_package(OpenCV CONFIG REQUIRED)
 message("OpenCV_FOUND = ${OpenCV_FOUND}")
 message("OpenCV_VERSION = ${OpenCV_VERSION}")
@@ -83,7 +100,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CommonTools)
 
-add_subdirectory(memory_array_opencv)
+add_subdirectory(hello_cuda)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)
