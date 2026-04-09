@@ -97,6 +97,11 @@ set(PYTHON_MOUDLES
 	Python3::Python
 )
 
+#cuda
+set(CUDA_MOUDLES
+	CUDA::cudart_static
+)
+
 #opencv
 set(Opencv_MOUDLES
     OpenCV_LIBS
@@ -124,8 +129,17 @@ macro(get_src_include)
     aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/Source SOURCE)
 	aux_source_directory(${CMAKE_CURRENT_LIST_DIR} SRC_CURRENT)
 
+	FILE(GLOB CUDA_SOURCE_FILES 
+        ${CMAKE_CURRENT_LIST_DIR}/src/*.cu
+        ${CMAKE_CURRENT_LIST_DIR}/Source/*.cu
+        ${CMAKE_CURRENT_LIST_DIR}/*.cu
+        ${CMAKE_CURRENT_LIST_DIR}/cuda/*.cu
+        ${CMAKE_CURRENT_LIST_DIR}/CUDA/*.cu
+    )
+
     list(APPEND SRC ${SOURCE})
     list(APPEND SRC ${SRC_CURRENT})
+	list(APPEND SRC ${CUDA_SOURCE_FILES})
 	# message("SRC = ${SRC}")
 	
 	###################################################################
@@ -135,6 +149,14 @@ macro(get_src_include)
 		${CMAKE_CURRENT_LIST_DIR}/include/*.hpp
 		${CMAKE_CURRENT_LIST_DIR}/*.h
 		${CMAKE_CURRENT_LIST_DIR}/*.hpp
+		
+		# CUDA 头文件（.cuh）
+        ${CMAKE_CURRENT_LIST_DIR}/include/*.cuh
+        ${CMAKE_CURRENT_LIST_DIR}/*.cuh
+        ${CMAKE_CURRENT_LIST_DIR}/cuda/*.cuh
+        ${CMAKE_CURRENT_LIST_DIR}/CUDA/*.cuh
+        ${CMAKE_CURRENT_LIST_DIR}/src/*.cuh
+        ${CMAKE_CURRENT_LIST_DIR}/Source/*.cuh
 	)
 	# message("H_FILE_I = ${H_FILE_I}")
 	
@@ -302,20 +324,24 @@ endmacro()
 macro(set_cpp name)
     target_link_directories(${name} PRIVATE ${SDK_LIB_DIRECTORY})
 
+####################################################################
+	#[[所有项目共用得一些库]]
     #message("Qt6_FOUND = ${Qt6_FOUND}")
     #target_link_libraries(${name} ${QT6_MOUDLES})
 	
 	# message("Libevent_FOUND = ${Libevent_FOUND}")
     # target_link_libraries(${name} ${Libevent_MOUDLES})
-	
+####################################################################	
+
 	if(FFMPEG_FOUND)
+		#[[兼容ffmpeg ]]
 		target_link_directories(${name} PRIVATE ${FFMPEG_LIBRARY_DIRS})
         target_include_directories(${name} PRIVATE ${FFMPEG_INCLUDE_DIRS})
     endif()
 	
     message("DPS_INCLUDES = ${DPS_INCLUDES}")
 
-    # 路径被两次引用 1 编译slib库时 2 install export写入config时
+    #[[ 路径被两次引用 1 编译slib库时 2 install export写入config时]]
     target_include_directories(${name} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # install时为空,只有编译时有值
         $<INSTALL_INTERFACE:include> # 只有install时有值 /home/hdb/xcpp/include
@@ -401,30 +427,56 @@ macro(set_cpp name)
 			)
 		endif()
 		
-			target_compile_definitions(${name} PRIVATE
-			_CRT_SECURE_NO_WARNINGS
-			# _SCL_SECURE_NO_WARNINGS
-			# _ITERATOR_DEBUG_LEVEL=0  # 在Debug中禁用迭代器调试
+		if(CMAKE_CUDA_COMPILER_LOADED)
+			target_compile_features(${name} PRIVATE
+				cuda_std_17
 			)
 			
-			set_target_properties(${name} PROPERTIES
-				COMPILE_FLAGS "/Zc:wchar_t"	# 是
-				#COMPILE_FLAGS "/Zc:wchar_t-" #否
+			target_compile_definitions(${name} PUBLIC
+				-D$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ENABLED>
 			)
+			
+			target_compile_options(${name} PRIVATE
+				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_75,code=sm_75>
+				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_80,code=sm_80>
+				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_86,code=sm_86>
+				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_89,code=sm_89>
+			)
+		
+			# if(CMAKE_CUDA_COMPILER_LOADED)
+			# set_target_properties(${name} PROPERTIES
+				# CUDA_RUNTIME_LIBRARY "Static"
+			# )
+			# endif()
+		endif()
+		
+			target_compile_definitions(${name} PRIVATE
+				_CRT_SECURE_NO_WARNINGS
+				# _SCL_SECURE_NO_WARNINGS
+				# _ITERATOR_DEBUG_LEVEL=0  # 在Debug中禁用迭代器调试
+			)
+			
+			
+			target_compile_options(${name} PRIVATE
+				$<$<COMPILE_LANGUAGE:CXX>:/Zc:wchar_t>
+			)
+			
 
 			# set_target_properties(${name} PROPERTIES
-			# COMPILE_FLAGS "-bigobj"
+			# 	COMPILE_FLAGS "-bigobj"
 			# )
 			
-			# 为特定目标设置MSVC运行时库
+			#[[为特定目标设置MSVC运行时库]]
 			target_compile_options(${name} PRIVATE
-				# Debug 配置使用 /MDd
-				"$<$<CONFIG:Debug>:/MDd>"
-				# Release, RelWithDebInfo, MinSizeRel 使用 /MD
-				"$<$<CONFIG:Release>:/MD>"
-				"$<$<CONFIG:RelWithDebInfo>:/MD>"
-				"$<$<CONFIG:MinSizeRel>:/MD>"
+				#Debug 配置使用 /MDd
+				$<$<COMPILE_LANGUAGE:CXX>:$<$<CONFIG:Debug>:/MDd>>
+				#Release, RelWithDebInfo, MinSizeRel 使用 /MD
+				$<$<COMPILE_LANGUAGE:CXX>:$<$<CONFIG:Release>:/MD>>
+				$<$<COMPILE_LANGUAGE:CXX>:$<$<CONFIG:RelWithDebInfo>:/MD>>
+				$<$<COMPILE_LANGUAGE:CXX>:$<$<CONFIG:MinSizeRel>:/MD>>
 			)
+			
+		
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "")
@@ -449,18 +501,19 @@ macro(set_cpp name)
         )
     endforeach()
 
-    # set_target_properties(${name} PROPERTIES
-    # DEBUG_POSTFIX "_d"
-    # )
+    set_target_properties(${name} PROPERTIES
+    DEBUG_POSTFIX "_d"
+    )
     set(debug_postfix "")
 
     if(WIN32)
-        get_target_property(debug_postfix ${name} DEBUG_POSTFIX)
-		if(MSVC)
-		 target_compile_options(${name} PRIVATE
-			$<$<CONFIG:Debug>:/ZI>
-			)
-		endif()
+		get_target_property(debug_postfix ${name} DEBUG_POSTFIX)
+		target_compile_options(${name} PRIVATE
+			$<$<COMPILE_LANGUAGE:CXX>:$<$<CONFIG:Debug>:/Zi>>
+		)
+		target_compile_options(${name} PRIVATE
+			$<$<COMPILE_LANGUAGE:CUDA>:-cudart=static>	
+		)	
     endif()
 endmacro()
 
