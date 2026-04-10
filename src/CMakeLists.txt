@@ -21,7 +21,7 @@ message("PROJECT_NAME: ${PROJECT_NAME}")
 # 查找 编译器
 if(MSVC)
 	enable_language(CXX)
-	# enable_language(CUDA)
+	enable_language(CUDA)
 	# enable_language(ASM_MASM)
 endif()
 
@@ -58,13 +58,13 @@ endif()
 # endif()
 
 # CUDA
-# find_package(CUDAToolkit REQUIRED)
-# message("CUDAToolkit_FOUND = ${CUDAToolkit_FOUND}")
-# message("CUDAToolkit_VERSION =  ${CUDAToolkit_VERSION}")
-# message(STATUS "CUDA Compiler: ${CMAKE_CUDA_COMPILER}")
-# message(STATUS "CUDA Compiler Version: ${CMAKE_CUDA_COMPILER_VERSION}")
-# message(STATUS "CUDA Toolkit Root: ${CUDAToolkit_ROOT}")
-# message(STATUS "CUDA Architectures: ${CMAKE_CUDA_ARCHITECTURES}")
+find_package(CUDAToolkit REQUIRED)
+message("CUDAToolkit_FOUND = ${CUDAToolkit_FOUND}")
+message("CUDAToolkit_VERSION =  ${CUDAToolkit_VERSION}")
+message(STATUS "CUDA Compiler: ${CMAKE_CUDA_COMPILER}")
+message(STATUS "CUDA Compiler Version: ${CMAKE_CUDA_COMPILER_VERSION}")
+message(STATUS "CUDA Toolkit Root: ${CUDAToolkit_ROOT}")
+message(STATUS "CUDA Architectures: ${CMAKE_CUDA_ARCHITECTURES}")
 
 # #Python3
 # find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -101,6 +101,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CommonTools)
 
 add_subdirectory(hello_cuda)
+add_subdirectory(dim_and_index)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)

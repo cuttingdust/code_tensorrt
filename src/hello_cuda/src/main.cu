@@ -29,7 +29,7 @@ int main()
     }
 
     printf("CUDA works!\n");
-    printf("CUDA_ENABLED = %d", CUDA_ENABLED);
+    // printf("CUDA_ENABLED = %d", CUDA_ENABLED);
 
 
     return 0;

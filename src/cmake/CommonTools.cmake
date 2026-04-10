@@ -432,8 +432,9 @@ macro(set_cpp name)
 				cuda_std_17
 			)
 			
+			message(STATUS "CUDA languages is enable")
 			target_compile_definitions(${name} PUBLIC
-				-D$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ENABLED>
+				$<$<COMPILE_LANGUAGE:CUDA>:-DCUDA_ENABLED>
 			)
 			
 			target_compile_options(${name} PRIVATE
