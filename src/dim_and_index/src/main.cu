@@ -18,9 +18,8 @@ __global__ void print_idx_kernel()
 {
     // blockIdx.z, blockIdx.y, blockIdx.x: 当前线程所在 block 的三维索引
     // threadIdx.z, threadIdx.y, threadIdx.x: 当前线程在 block 内的三维索引
-    printf("block idx: (%3d, %3d, %3d), thread idx: (%3d, %3d, %3d)\n", 
-           blockIdx.z, blockIdx.y, blockIdx.x, 
-           threadIdx.z, threadIdx.y, threadIdx.x);
+    printf("block idx: (%3d, %3d, %3d), thread idx: (%3d, %3d, %3d)\n", blockIdx.z, blockIdx.y, blockIdx.x, threadIdx.z,
+           threadIdx.y, threadIdx.x);
 }
 
 // ============================================================================
@@ -32,9 +31,8 @@ __global__ void print_dim_kernel()
 {
     // blockDim.z, blockDim.y, blockDim.x: 每个 block 在三个维度上的线程数
     // gridDim.z, gridDim.y, gridDim.x: 整个 grid 在三个维度上的 block 数
-    printf("block dim: (%3d, %3d, %3d), grid dim: (%3d, %3d, %3d)\n", 
-           blockDim.z, blockDim.y, blockDim.x, 
-           gridDim.z, gridDim.y, gridDim.x);
+    printf("block dim: (%3d, %3d, %3d), grid dim: (%3d, %3d, %3d)\n", blockDim.z, blockDim.y, blockDim.x, gridDim.z,
+           gridDim.y, gridDim.x);
 }
 
 // ============================================================================
@@ -48,12 +46,9 @@ __global__ void print_thread_idx_per_block_kernel()
     // threadIdx.z * blockDim.x * blockDim.y : 跳过前面 z 个完整平面
     // threadIdx.y * blockDim.x              : 在当前平面内跳过前面 y 整行
     // threadIdx.x                           : 加上当前行内的 x 偏移
-    int index = threadIdx.z * blockDim.x * blockDim.y 
-              + threadIdx.y * blockDim.x 
-              + threadIdx.x;
-    
-    printf("block idx: (%3d, %3d, %3d), thread idx: %3d\n", 
-           blockIdx.z, blockIdx.y, blockIdx.x, index);
+    int index = threadIdx.z * blockDim.x * blockDim.y + threadIdx.y * blockDim.x + threadIdx.x;
+
+    printf("block idx: (%3d, %3d, %3d), thread idx: %3d\n", blockIdx.z, blockIdx.y, blockIdx.x, index);
 }
 
 // ============================================================================
@@ -68,21 +63,16 @@ __global__ void print_thread_idx_per_grid_kernel()
 
     // bIndex: 当前 block 在整个 grid 中的一维编号（第几个 block）
     // 公式含义：跳过前面 z 层完整平面，再跳过前面 y 行，再加上 x
-    int bIndex = blockIdx.z * gridDim.x * gridDim.y 
-               + blockIdx.y * gridDim.x 
-               + blockIdx.x;
+    int bIndex = blockIdx.z * gridDim.x * gridDim.y + blockIdx.y * gridDim.x + blockIdx.x;
 
     // tIndex: 当前线程在所在 block 中的一维编号（第几个线程）
-    int tIndex = threadIdx.z * blockDim.x * blockDim.y 
-               + threadIdx.y * blockDim.x 
-               + threadIdx.x;
+    int tIndex = threadIdx.z * blockDim.x * blockDim.y + threadIdx.y * blockDim.x + threadIdx.x;
 
     // index: 当前线程在整个 grid 中的全局一维编号
     // 公式含义：前面所有 block 的线程总数 + 当前 block 内的线程编号
     int index = bIndex * bSize + tIndex;
 
-    printf("block idx: %3d, thread idx in block: %3d, thread idx: %3d\n", 
-           bIndex, tIndex, index);
+    printf("block idx: %3d, thread idx in block: %3d, thread idx: %3d\n", bIndex, tIndex, index);
 }
 
 // ============================================================================
@@ -92,19 +82,19 @@ __global__ void print_thread_idx_per_grid_kernel()
 // ============================================================================
 void print_one_dim()
 {
-    int inputSize = 8;      // 总共 8 个元素
-    int blockDim  = 4;      // 每个 block 4 个线程
-    int gridDim = inputSize / blockDim;  // 需要 2 个 block
+    int inputSize = 8;                    // 总共 8 个元素
+    int blockDim  = 4;                    // 每个 block 4 个线程
+    int gridDim   = inputSize / blockDim; // 需要 2 个 block
 
-    dim3 block(blockDim);   // block = (4, 1, 1)
-    dim3 grid(gridDim);     // grid = (2, 1, 1)
+    dim3 block(blockDim); // block = (4, 1, 1)
+    dim3 grid(gridDim);   // grid = (2, 1, 1)
 
     // 取消注释下面的任意一行来测试对应的内核函数
     // print_idx_kernel<<<grid, block>>>();
     // print_dim_kernel<<<grid, block>>>();
     // print_thread_idx_per_block_kernel<<<grid, block>>>();
     print_thread_idx_per_grid_kernel<<<grid, block>>>();
-    cudaDeviceSynchronize();  // 等待 GPU 执行完成，确保 printf 输出
+    cudaDeviceSynchronize(); // 等待 GPU 执行完成，确保 printf 输出
 }
 
 // ============================================================================
@@ -114,12 +104,12 @@ void print_one_dim()
 // ============================================================================
 void print_two_dim()
 {
-    int inputWidth = 4;      // 4x4 矩阵
-    int blockDim = 2;        // 每个 block 2x2 个线程
-    int gridDim = inputWidth / blockDim;  // 需要 2x2 个 block
+    int inputWidth = 4;                     // 4x4 矩阵
+    int blockDim   = 2;                     // 每个 block 2x2 个线程
+    int gridDim    = inputWidth / blockDim; // 需要 2x2 个 block
 
-    dim3 block(blockDim, blockDim);  // block = (2, 2, 1)
-    dim3 grid(gridDim, gridDim);     // grid = (2, 2, 1)
+    dim3 block(blockDim, blockDim); // block = (2, 2, 1)
+    dim3 grid(gridDim, gridDim);    // grid = (2, 2, 1)
 
     print_thread_idx_per_grid_kernel<<<grid, block>>>();
     cudaDeviceSynchronize();
@@ -133,9 +123,7 @@ void print_two_dim()
 __global__ void print_cord_kernel()
 {
     // index: 线程在 block 内的一维编号（0 ~ blockDim.x*blockDim.y-1）
-    int index = threadIdx.z * blockDim.x * blockDim.y 
-              + threadIdx.y * blockDim.x 
-              + threadIdx.x;
+    int index = threadIdx.z * blockDim.x * blockDim.y + threadIdx.y * blockDim.x + threadIdx.x;
 
     // x: 线程在整个 grid 中的 X 坐标（列）
     // 公式：前面的 block 贡献的列数 + 当前 block 内的列偏移
@@ -146,8 +134,8 @@ __global__ void print_cord_kernel()
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     // 打印：block 索引，block 内线程编号，全局坐标
-    printf("block idx: (%3d, %3d, %3d), thread idx: %3d, cord: (%3d, %3d)\n", 
-           blockIdx.z, blockIdx.y, blockIdx.x, index, x, y);
+    printf("block idx: (%3d, %3d, %3d), thread idx: %3d, cord: (%3d, %3d)\n", blockIdx.z, blockIdx.y, blockIdx.x, index,
+           x, y);
 }
 
 // ============================================================================
@@ -157,12 +145,12 @@ __global__ void print_cord_kernel()
 // ============================================================================
 void print_cord()
 {
-    int inputWidth = 4;      // 4x4 矩阵
-    int blockDim = 2;        // 每个 block 2x2 个线程
-    int gridDim = inputWidth / blockDim;  // 需要 2x2 个 block
+    int inputWidth = 4;                     // 4x4 矩阵
+    int blockDim   = 2;                     // 每个 block 2x2 个线程
+    int gridDim    = inputWidth / blockDim; // 需要 2x2 个 block
 
-    dim3 block(blockDim, blockDim);  // block = (2, 2, 1)
-    dim3 grid(gridDim, gridDim);     // grid = (2, 2, 1)
+    dim3 block(blockDim, blockDim); // block = (2, 2, 1)
+    dim3 grid(gridDim, gridDim);    // grid = (2, 2, 1)
 
     print_cord_kernel<<<grid, block>>>();
     cudaDeviceSynchronize();
@@ -176,7 +164,7 @@ int main()
     // 取消注释下面的任意一行来测试不同的功能
     // print_one_dim();   // 测试一维配置
     // print_two_dim();   // 测试二维配置
-    print_cord();        // 测试二维坐标计算（当前启用）
-    
+    print_cord(); // 测试二维坐标计算（当前启用）
+
     return 0;
 }
