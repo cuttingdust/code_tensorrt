@@ -104,6 +104,7 @@ add_subdirectory(hello_cuda)
 add_subdirectory(dim_and_index)
 add_subdirectory(cpp_cuda_interactive)
 add_subdirectory(matmul_basic)
+add_subdirectory(error-handler)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)
