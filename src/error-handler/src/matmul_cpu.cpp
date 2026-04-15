@@ -29,3 +29,13 @@ void MatmulOnHost(float *M, float *N, float *P, int width)
         }
     }
 }
+
+void MataddOnHost(float *M, float *N, float *P, int width)
+{
+    for (int i = 0; i < width; i++)
+        for (int j = 0; j < width; j++)
+        {
+            int idx = j * width + i;
+            P[idx]  = M[idx] + N[idx];
+        }
+}
