@@ -433,8 +433,16 @@ macro(set_cpp name)
 			)
 			
 			message(STATUS "CUDA languages is enable")
-			target_compile_definitions(${name} PUBLIC
+			target_compile_definitions(${name} PRIVATE
 				$<$<COMPILE_LANGUAGE:CUDA>:-DCUDA_ENABLED>
+			)
+			
+			target_compile_options(${name} PRIVATE
+				$<$<CONFIG:Debug>:
+					$<$<COMPILE_LANGUAGE:CUDA>:
+						-G -lineinfo
+					>
+				>
 			)
 			
 			target_compile_options(${name} PRIVATE
@@ -443,6 +451,7 @@ macro(set_cpp name)
 				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_86,code=sm_86>
 				$<$<COMPILE_LANGUAGE:CUDA>:--generate-code=arch=compute_89,code=sm_89>
 			)
+		
 		
 			# if(CMAKE_CUDA_COMPILER_LOADED)
 			# set_target_properties(${name} PROPERTIES
