@@ -107,7 +107,7 @@ add_subdirectory(matmul_basic)
 add_subdirectory(error-handler)
 add_subdirectory(device-info)
 add_subdirectory(nsight_system_and_compute)
-#add_subdirectory(matmul-shared-memory)
+add_subdirectory(matmul-shared-memory)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)

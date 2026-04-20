@@ -1,4 +1,6 @@
-﻿#include <chrono>
+﻿#pragma once
+
+#include <chrono>
 #include <cstdio>
 #include <ratio>
 #include <string>
