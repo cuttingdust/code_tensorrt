@@ -90,13 +90,13 @@ int main(int argc, char* argv[])
     /// 这个错误属于参数设定的错误。类似的错误比如说还有设置过大的shared_memory
     /// 如果没有使用error handler进行错误排查的话是无法发现错误的
 
-    // timer.start();
-    // blockSize = 64;
-    // MatmulOnDevice(h_matM, h_matN, d_matP, width, blockSize);
-    // timer.stop();
-    // std::sprintf(str, "matmul in gpu(general)<<<%d, %d>>>", width / blockSize, blockSize);
-    // timer.duration<Timer::ms>(str);
-    // compareMat(h_matP, d_matP, size);
+    timer.start();
+    blockSize = 64;
+    MatmulOnDevice(h_matM, h_matN, d_matP, width, blockSize);
+    timer.stop();
+    std::sprintf(str, "matmul in gpu(general)<<<%d, %d>>>", width / blockSize, blockSize);
+    timer.duration<Timer::ms>(str);
+    compareMat(h_matP, d_matP, size);
     // getchar();
     return 0;
 }

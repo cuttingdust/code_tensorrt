@@ -2,7 +2,6 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-
 __global__ void MatmulKernel(float *M_device, float *N_device, float *P_device, int width)
 {
     /// 我们设定每一个thread负责P中的一个坐标的matmul
