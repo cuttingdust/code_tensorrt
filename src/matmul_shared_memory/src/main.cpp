@@ -45,7 +45,6 @@ int main(int argc, char* argv[])
     timer.stop_gpu();
     std::sprintf(str, "matmul in gpu(without shared memory)<<<%d, %d>>>", width / blockSize, blockSize);
     timer.duration_gpu(str);
-    compareMat(h_matP, d_matP, size);
 
     /// GPU general implementation <<<256, 16>>>
     timer.start_gpu();
@@ -53,7 +52,6 @@ int main(int argc, char* argv[])
     timer.stop_gpu();
     std::sprintf(str, "matmul in gpu(with shared memory(static))<<<%d, %d>>>", width / blockSize, blockSize);
     timer.duration_gpu(str);
-    compareMat(h_matP, d_matP, size);
 
     /// GPU general implementation <<<256, 16>>>
     statMem = false;
@@ -62,7 +60,6 @@ int main(int argc, char* argv[])
     timer.stop_gpu();
     std::sprintf(str, "matmul in gpu(with shared memory(dynamic))<<<%d, %d>>>", width / blockSize, blockSize);
     timer.duration_gpu(str);
-    compareMat(h_matP, d_matP, size);
 
 
     return 0;
