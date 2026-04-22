@@ -4,7 +4,7 @@
 
 // 定义 Tile（分块）的大小为 16x16
 // Tile 是矩阵乘法中一次加载到共享内存中的子块大小
-#define BLOCKSIZE 16
+#define BLOCKSIZE 32
 
 /*
     使用共享内存（Shared Memory）优化矩阵乘法的静态版本
