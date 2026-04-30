@@ -110,6 +110,7 @@ add_subdirectory(nsight_system_and_compute)
 add_subdirectory(matmul_shared_memory)
 add_subdirectory(bank_conflict)
 add_subdirectory(stream_and_event)
+add_subdirectory(bilinear_interpolation)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)

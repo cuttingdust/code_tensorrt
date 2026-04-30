@@ -104,7 +104,7 @@ set(CUDA_MOUDLES
 
 #opencv
 set(Opencv_MOUDLES
-    OpenCV_LIBS
+    ${OpenCV_LIBS}
 )
 
 #ffmpeg
